@@ -1,0 +1,38 @@
+{
+  "name": "pi-smart-reader",
+  "version": "0.1.0",
+  "description": "Optimizes token usage by providing skeletal views and targeted symbol extraction for large files.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "keywords": [
+    "pi",
+    "pi-package",
+    "context-optimization",
+    "ast",
+    "token-savings"
+  ],
+  "author": "ZachDreamZ",
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "dist/index.js"
+    ]
+  },
+  "dependencies": {
+    "tree-sitter": "^0.21.1",
+    "tree-sitter-typescript": "^0.23.2",
+    "web-tree-sitter": "latest"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
