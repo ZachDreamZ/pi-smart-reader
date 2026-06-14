@@ -25,7 +25,7 @@ export class SmartParser {
 			this.language = lang;
 		} catch (error) {
 			console.error("[pi-smart-reader] Initialization failed:", error);
-			throw new Error(`Failed to initialize tree-sitter: ${error}`);
+			throw new Error("Failed to initialize tree-sitter", { cause: error });
 		}
 	}
 

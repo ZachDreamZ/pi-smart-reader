@@ -33,6 +33,15 @@ Surgically extracts the full body of a specific function, method, or variable.
 ### Internal Dependency Awareness
 Automatically identifies internal calls within the extracted symbol. If a function calls another helper in the same file, the tool suggests that related symbol, preventing the agent from having to guess dependencies.
 
+### ⚡ Integration with pi-impact-analyzer
+`pi-smart-reader` works in tandem with `pi-impact-analyzer` to provide a high-efficiency debugging workflow:
+1. **Analyze**: Use `impact_analyze` to identify the "blast radius" of a change.
+2. **Map**: Use `smart_read` in `skeleton` mode to see the structure of affected files.
+3. **Inspect**: Use `smart_read` in `symbol` mode to extract only the relevant logic of affected symbols.
+
+This combination reduces context window usage by up to 90% compared to reading full files.
+
+
 ## Installation
 
 ```bash

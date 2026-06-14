@@ -3,19 +3,11 @@ import { SmartParser } from "./parser";
 import { SkeletonEngine } from "./skeleton";
 import { SymbolExtractor } from "./extractor";
 import { readFileSync } from "fs";
+import path from "path";
 
 export default async function (pi: ExtensionAPI) {
 	const parser = new SmartParser();
-
-	// Configuration for JS/TS (using hosted WASM for simplicity in this version)
-	const config = {
-		wasmPath:
-			"https://github.com/tree-sitter/tree-sitter-wasm/releases/download/v0.20.0/tree-sitter.wasm",
-		languagePath:
-			"https://github.com/tree-sitter/tree-sitter-typescript/releases/download/v0.20.0/tree-sitter-typescript.wasm",
-	};
-
-	await parser.initialize(config);
+	await parser.initialize();
 	const skeletonEngine = new SkeletonEngine(parser);
 	const symbolExtractor = new SymbolExtractor(parser);
 
@@ -47,12 +39,18 @@ export default async function (pi: ExtensionAPI) {
 			required: ["path", "options"],
 		},
 		handler: async (input: any, _ctx: any) => {
-			const { path, options } = input;
+			const { path: filePath, options } = input;
+			const mode = options?.mode;
 
 			try {
-				const source = readFileSync(path, "utf8");
+				if (!mode) {
+					throw new Error("options.mode is required.");
+				}
 
-				if (options.mode === "skeleton") {
+				const absolutePath = path.resolve(filePath);
+				const source = readFileSync(absolutePath, "utf8");
+
+				if (mode === "skeleton") {
 					return {
 						content: skeletonEngine.generateSkeleton(source),
 						mode: "skeleton",
@@ -61,7 +59,7 @@ export default async function (pi: ExtensionAPI) {
 					};
 				}
 
-				if (options.mode === "symbol") {
+				if (mode === "symbol") {
 					if (!options.symbol) {
 						throw new Error("Symbol name is required for 'symbol' mode.");
 					}
@@ -79,10 +77,13 @@ export default async function (pi: ExtensionAPI) {
 					};
 				}
 
-				throw new Error(`Unsupported mode: ${options.mode}`);
+				throw new Error(`Unsupported mode: ${mode}`);
 			} catch (error: any) {
 				return {
-					error: `Failed to smart-read ${path}: ${error.message}`,
+					content: "",
+					mode: mode || "unknown",
+					message: "",
+					error: `Failed to smart-read ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
 				};
 			}
 		},

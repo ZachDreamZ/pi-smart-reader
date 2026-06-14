@@ -1,9 +1,10 @@
 {
   "name": "pi-smart-reader",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "description": "Optimizes token usage by providing skeletal views and targeted symbol extraction for large files.",
   "main": "extensions/index.ts",
   "scripts": {
+    "test": "jest",
     "build": "tsc",
     "dev": "tsc -w"
   },
@@ -17,9 +18,12 @@
   "author": "ZachDreamZ",
   "license": "MIT",
   "pi": {
-    "extensions": ["./extensions"]
+    "extensions": [
+      "./extensions"
+    ]
   },
   "dependencies": {
+    "pi-impact-analyzer": "^0.2.0",
     "web-tree-sitter": "latest"
   },
   "peerDependencies": {
@@ -27,7 +31,10 @@
     "@earendil-works/pi-coding-agent": "*"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.11",
     "typescript": "^5.0.0"
   }
 }

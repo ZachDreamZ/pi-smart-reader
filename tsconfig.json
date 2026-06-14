@@ -4,13 +4,15 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "./extensions",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "declaration": true
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
   },
-  "include": ["src/**/*"],
-  "typeRoots": ["./node_modules/@types", "src/types"]
+  "include": ["extensions/**/*"],
+  "typeRoots": ["./node_modules/@types", "extensions/types"]
 }

@@ -11,59 +11,85 @@ export class SkeletonEngine {
 	public generateSkeleton(source: string): string {
 		const tree = this.parser.parse(source);
 		const root = tree.rootNode;
+		const lines = source.split("\n");
 
-		let skeleton = "";
-		const lines = source.split("\\n");
+		const signatures: string[] = [];
+		this.walkAndExtract(root, lines, signatures, 0);
 
-		const walkAndLog = (node: any, depth = 0) => {
-			if (node.text.includes("login")) {
-				console.log(`Depth ${depth} | Type: ${node.type} | Text: ${node.text}`);
-			}
-			for (const child of node.namedChildren) {
-				walkAndLog(child, depth + 1);
-			}
-		};
-		walkAndLog(root);
+		return (
+			signatures.join("\n\n") || "// No structural symbols found in this file."
+		);
+	}
 
-		// We iterate through the top-level named children
-		for (const node of root.namedChildren) {
-			if (this.isSignatureNode(node)) {
-				skeleton += this.extractSignature(node, lines) + "\\n";
-			} else if (node.type === "comment") {
-				skeleton += node.text + "\\n";
-			}
+	private walkAndExtract(
+		node: Node,
+		lines: string[],
+		signatures: string[],
+		depth: number,
+	): void {
+		if (this.isSignatureNode(node)) {
+			signatures.push(this.extractSignature(node, lines, depth));
 		}
 
-		return skeleton || "// No structural symbols found in this file.";
+		for (const child of node.namedChildren) {
+			this.walkAndExtract(child, lines, signatures, depth + 1);
+		}
 	}
 
 	private isSignatureNode(node: Node): boolean {
-		const types = [
-			"function_declaration",
-			"method_definition",
-			"class_declaration",
-			"variable_declaration",
-		];
-		return types.includes(node.type);
-	}
-
-	private extractSignature(node: Node, lines: string[]): string {
-		const startLine = node.startPosition.row;
-		const endLine = node.endPosition.row;
-
-		// For signatures, we want the line where the name/params are,
-		// but we want to stop before the opening brace '{'
-		let result = "";
-		for (let i = startLine; i <= endLine; i++) {
-			const line = lines[i] || "";
-			if (line.includes("{")) {
-				result += line.split("{")[0] + " { // ... implementation";
-				break;
-			}
-			result += line + "\\n";
+		if (
+			node.type === "function_declaration" ||
+			node.type === "method_definition" ||
+			node.type === "generator_function_declaration" ||
+			node.type === "class_declaration"
+		) {
+			return true;
 		}
 
-		// Trim trailing newlines
-		return result.trimEnd();
+		if (node.type === "lexical_declaration") {
+			return node.namedChildren.some((child) => {
+				if (child.type !== "variable_declarator") return false;
+				return child.namedChildren.some((grandchild) => {
+					return (
+						grandchild.type === "arrow_function" ||
+						grandchild.type === "function"
+					);
+				});
+			});
+		}
+
+		return false;
+	}
+
+	private extractSignature(node: Node, lines: string[], depth: number): string {
+		const indent = "  ".repeat(depth);
+
+		// Find the block node recursively to handle nested declarations (e.g. lexical_declaration -> variable_declarator -> arrow_function -> block)
+		const findBlock = (n: Node): Node | null => {
+			if (n.type === "block") return n;
+			for (const child of n.namedChildren) {
+				const found = findBlock(child);
+				if (found) return found;
+			}
+			return null;
+		};
+
+		const block = findBlock(node);
+
+		if (block) {
+			const fullText = lines.join("\n");
+			const signatureText = fullText
+				.slice(node.startIndex, block.startIndex)
+				.trimEnd();
+			return `${indent}${signatureText} { // ... implementation`;
+		}
+
+		const startLine = node.startPosition.row;
+		const endLine = node.endPosition.row;
+		const text = lines
+			.slice(startLine, endLine + 1)
+			.join("\n")
+			.trimEnd();
+		return `${indent}${text}`;
 	}
 }
