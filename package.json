@@ -1,6 +1,6 @@
 {
   "name": "pi-smart-reader",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Optimizes token usage by providing skeletal views and targeted symbol extraction for large files.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,9 +18,7 @@
   "author": "ZachDreamZ",
   "license": "MIT",
   "pi": {
-    "extensions": [
-      "dist/index.js"
-    ]
+    "extensions": ["./extensions"]
   },
   "dependencies": {
     "tree-sitter": "^0.21.1",
