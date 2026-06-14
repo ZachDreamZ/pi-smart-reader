@@ -1,9 +1,8 @@
 {
   "name": "pi-smart-reader",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Optimizes token usage by providing skeletal views and targeted symbol extraction for large files.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "extensions/index.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w"

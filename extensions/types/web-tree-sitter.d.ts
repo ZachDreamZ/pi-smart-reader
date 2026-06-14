@@ -1,4 +1,4 @@
-declare module 'web-tree-sitter' {
+declare module "web-tree-sitter" {
 	export default class Parser {
 		static init(options: { wasmPath: string }): Promise<void>;
 		constructor();

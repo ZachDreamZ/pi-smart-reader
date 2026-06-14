@@ -15,11 +15,11 @@ export class SmartParser {
 	public async initialize(_config?: ParserConfig): Promise<void> {
 		try {
 			await Parser.init({
-				wasmPath: _config?.wasmPath || "./wasm/tree-sitter.wasm"
+				wasmPath: _config?.wasmPath || "./wasm/tree-sitter.wasm",
 			});
 			this.parser = new Parser();
 			const lang = await Parser.Language.load(
-				_config?.languagePath || "./wasm/tree-sitter-typescript.wasm"
+				_config?.languagePath || "./wasm/tree-sitter-typescript.wasm",
 			);
 			this.parser.setLanguage(lang);
 			this.language = lang;
