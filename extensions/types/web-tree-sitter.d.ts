@@ -1,6 +1,6 @@
 declare module 'web-tree-sitter' {
 	export default class Parser {
-		static async init(options: { wasmPath: string }): Promise<void>;
+		static init(options: { wasmPath: string }): Promise<void>;
 		constructor();
 		setLanguage(language: any): void;
 		parse(source: string): Tree;
@@ -12,7 +12,6 @@ declare module 'web-tree-sitter' {
 
 	export interface Tree {
 		rootNode: Node;
-		// Simplified for this extension's needs
 	}
 
 	export interface Node {
