@@ -89,6 +89,58 @@ The agent identifies `verifyToken` as the target and extracts it precisely.
 - **Complexity**: Parsing occurs in $O(N)$ time, while context impact is reduced to $O(1)$ relative to the extracted symbol size.
 - **Language Support**: Full support for TypeScript and JavaScript.
 
+## Passive Mode (v0.3.0+)
+
+`pi-smart-reader` now operates as a **passive tool** that works automatically in the background:
+
+- **Automatic Detection**: Monitors file reads and detects large files (>500 lines)
+- **Transparent Optimization**: Generates skeletal views without user intervention
+- **Caching**: Parsed skeletons are cached for 60 seconds to avoid redundant work
+- **Non-Intrusive**: Works alongside Pi's normal file reading flow
+
+### Configuration
+
+Use the `/smart-reader` command to configure passive mode:
+
+```
+/smart-reader on          # Enable passive mode
+/smart-reader off         # Disable passive mode
+/smart-reader status      # Show current configuration
+/smart-reader threshold 300  # Set line threshold to 300
+```
+
+### How It Works
+
+1. When Pi reads a file via the `read` tool, `pi-smart-reader` intercepts the result
+2. If the file is large (>500 lines) and a supported language, it generates a skeletal view
+3. The skeletal view is stored in context for Pi to reference
+4. You can still use `smart_read` tool manually for explicit control
+
+## Audit Report
+
+This package has been audited by the **pi-audit-master** extension for code quality, security, and reliability. The full audit report is available in [`AUDIT-REPORT.md`](AUDIT-REPORT.md).
+
+### Audit Summary
+
+| Category | Issues Found | Issues Fixed |
+|----------|--------------|--------------|
+| 🔴 Critical | 2 | 2 ✅ |
+| 🟠 High | 4 | 4 ✅ |
+| 🟡 Medium | 3 | 3 ✅ |
+| 🟢 Low | 1 | 1 ✅ |
+| **Total** | **10** | **10** ✅ |
+
+### Key Improvements
+
+- **Passive Mode**: Now works automatically in background
+- **Caching**: Parsed skeletons cached to avoid redundant work
+- **File Size Threshold**: Only optimizes large files (>500 lines)
+- **Language Detection**: Supports TypeScript, JavaScript, Python, Rust
+- **Error Recovery**: Graceful degradation if parser fails
+- **Configuration**: User-controllable via `/smart-reader` command
+
+For detailed findings and recommendations, see the [full audit report](AUDIT-REPORT.md).
+
 ## Contributing
 
 Contributions are welcome. We are seeking support for:

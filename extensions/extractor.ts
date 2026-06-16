@@ -26,7 +26,7 @@ export class SymbolExtractor {
 		// To safely slice a UTF-8 string in JS, we convert to Buffer first.
 		const buffer = Buffer.from(source, "utf8");
 		const content = buffer
-			.slice(targetNode.startIndex, targetNode.endIndex)
+			.subarray(targetNode.startIndex, targetNode.endIndex)
 			.toString("utf8");
 		const related = this.findRelatedSymbols(targetNode);
 
@@ -37,14 +37,6 @@ export class SymbolExtractor {
 	}
 
 	private findSymbolNode(node: Node, name: string): Node | null {
-		const symbolNodeTypes = new Set([
-			"function_declaration",
-			"method_definition",
-			"generator_function_declaration",
-			"arrow_function",
-			"class_declaration",
-		]);
-
 		const walk = (n: Node): Node | null => {
 			if (this.isSymbolNodeWithName(n, name)) {
 				return this.getSymbolContainer(n);

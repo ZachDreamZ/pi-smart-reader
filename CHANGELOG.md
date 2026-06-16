@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-06-16
+### Added
+- **Passive Mode**: Smart Reader now works automatically in the background without explicit invocation.
+- **Event Integration**: Hooks into Pi's `tool_result` events to intercept file reads.
+- **File Size Threshold**: Only optimizes files larger than 500 lines (configurable).
+- **Caching**: Parsed skeletons are cached for 60 seconds to avoid redundant work.
+- **Language Detection**: Automatically detects TypeScript, JavaScript, Python, Rust from file extensions.
+- **Configuration Command**: `/smart-reader` command to enable/disable passive mode and adjust settings.
+- **Error Recovery**: Graceful degradation if parser initialization fails.
+- **Debug Logging**: Optional logging via `DEBUG=1` or `PI_DEBUG=1` environment variables.
+
+### Fixed
+- **Deprecated Buffer.slice()**: Replaced with `buffer.subarray()` for Node.js compatibility.
+- **Unused Variable**: Removed unused `symbolNodeTypes` variable in extractor.
+- **Parser Initialization**: Now returns boolean instead of throwing, allowing graceful fallback.
+
+### Changed
+- **Version**: Bumped to 0.3.0 for passive mode feature.
+- **Architecture**: Tool now works both actively (manual invocation) and passively (automatic).
+
 ## [0.2.0] - 2026-06-14
 
 ### Added

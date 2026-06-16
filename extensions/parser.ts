@@ -11,8 +11,9 @@ export class SmartParser {
 
 	/**
 	 * Initializes the tree-sitter parser with TypeScript support.
+	 * @returns true if initialization succeeded, false otherwise
 	 */
-	public async initialize(_config?: ParserConfig): Promise<void> {
+	public async initialize(_config?: ParserConfig): Promise<boolean> {
 		try {
 			await Parser.init({
 				wasmPath: _config?.wasmPath || "./wasm/tree-sitter.wasm",
@@ -23,9 +24,10 @@ export class SmartParser {
 			);
 			this.parser.setLanguage(lang);
 			this.language = lang;
+			return true;
 		} catch (error) {
 			console.error("[pi-smart-reader] Initialization failed:", error);
-			throw new Error("Failed to initialize tree-sitter", { cause: error });
+			return false;
 		}
 	}
 
