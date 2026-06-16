@@ -1,7 +1,7 @@
 {
   "name": "pi-smart-reader",
-  "version": "0.3.0",
-  "description": "Optimizes token usage by providing skeletal views and targeted symbol extraction for large files.",
+  "version": "0.4.0",
+  "description": "Passive token optimization for Pi sessions. Auto-optimizes large files (300+ lines) with no configuration required.",
   "main": "extensions/index.ts",
   "scripts": {
     "test": "jest",

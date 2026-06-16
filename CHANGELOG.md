@@ -5,7 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-06-16
+
+### Added
+- **Passive by Default** — Always-on operation with no configuration required. Works out-of-the-box.
+- **Impact Analyzer Integration** — Listens to `impact_detected` events and pre-generates skeletons for affected files.
+- **Context Optimization** — Auto-optimizes when context usage exceeds 70%.
+- **Intelligent Caching** — File hashing + LRU eviction for optimal cache management.
+- **5-Minute Cache TTL** — Longer cache lifetime (300,000ms) for better performance.
+- **Max Cache Size** — Configurable cache limit (1000 entries) with automatic eviction.
+- **Session Lifecycle** — Proper initialization and cleanup on session start/end.
+- **Configuration API** — `updateConfig()`, `getConfig()`, `clearCache()` for programmatic control.
+
+### Changed
+- **Default Threshold** — Lowered from 500 to 300 lines for better optimization.
+- **Cache TTL** — Increased from 60s to 5 minutes for fresh skeletons.
+- **Language Support** — Added Go and Java to supported languages.
+- **Error Handling** — Returns graceful results instead of throwing.
+- **Performance** — Optimized skeleton generation with intelligent caching.
+
+### Fixed
+- **Type Errors** — Fixed `unknown` type issues in impact integration.
+- **Duplicate Properties** — Fixed serialization issues in cache saving.
+- **Unused Parameters** — Added underscore prefix for unused event handler parameters.
+
 ## [0.3.0] - 2026-06-16
+
 ### Added
 - **Passive Mode**: Smart Reader now works automatically in the background without explicit invocation.
 - **Event Integration**: Hooks into Pi's `tool_result` events to intercept file reads.
@@ -45,4 +70,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **WASM Loading**: Defaulted to local WASM files in `./wasm/` for stability.
 
 ## [0.1.8] - 2026-06-14
+
 Initial release.
