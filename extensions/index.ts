@@ -524,9 +524,8 @@ export default async function (pi: ExtensionAPI) {
 		};
 	}
 
-	// Expose status for other tools
-	(smartReader as any).getStatus = getStatus;
-	(smartReader as any).clearCache = clearCache;
+	// Expose status for other tools via the module's named export
+	updateSmartReaderState({ getStatus, clearCache });
 
 	// ============ Session Lifecycle ============
 
@@ -543,10 +542,26 @@ export default async function (pi: ExtensionAPI) {
 	log("Extension loaded (passive mode, always on)");
 }
 
-// Named export for external access
+// ============ External API for other extensions ============
+
+let _getStatus: (() => any) | null = null;
+let _clearCache: (() => void) | null = null;
+
+/** Internal: update the shared state (called from the extension factory) */
+export function updateSmartReaderState(state: {
+	getStatus: () => any;
+	clearCache: () => void;
+}): void {
+	_getStatus = state.getStatus;
+	_clearCache = state.clearCache;
+}
+
+/** Named export for external access by other Pi extensions */
 export function smartReader() {
 	return {
-		getStatus: () => null,
-		clearCache: () => {},
+		getStatus: () => (_getStatus ? _getStatus() : null),
+		clearCache: () => {
+			if (_clearCache) _clearCache();
+		},
 	};
 }

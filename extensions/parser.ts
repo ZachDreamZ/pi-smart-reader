@@ -1,4 +1,25 @@
 import Parser from "web-tree-sitter";
+import { readFileSync } from "fs";
+import path from "path";
+
+/**
+ * Resolve path to a WASM file relative to this package.
+ * Tries both dist/extensions/ (built) and extensions/ (ts-jest) modes.
+ */
+function resolveWasmPath(wasmFile: string): string {
+	const locations = [
+		path.join(__dirname, "..", "..", "wasm", wasmFile),
+		path.join(__dirname, "..", "wasm", wasmFile),
+	];
+	for (const loc of locations) {
+		try {
+			readFileSync(loc);
+			return loc;
+		} catch {
+		}
+	}
+	return locations[0];
+}
 
 export interface ParserConfig {
 	wasmPath?: string;
@@ -15,13 +36,16 @@ export class SmartParser {
 	 */
 	public async initialize(_config?: ParserConfig): Promise<boolean> {
 		try {
-			await Parser.init({
-				wasmPath: _config?.wasmPath || "./wasm/tree-sitter.wasm",
-			});
+			await Parser.init({});
 			this.parser = new Parser();
-			const lang = await Parser.Language.load(
-				_config?.languagePath || "./wasm/tree-sitter-typescript.wasm",
-			);
+
+			// Resolve language WASM file
+			const wasmPath =
+				_config?.languagePath ||
+				resolveWasmPath("tree-sitter-typescript.wasm");
+			const wasmBytes = readFileSync(wasmPath);
+
+			const lang = await (Parser as any).Language.load(wasmBytes);
 			this.parser.setLanguage(lang);
 			this.language = lang;
 			return true;
@@ -41,7 +65,7 @@ export class SmartParser {
 		return this.parser.parse(source);
 	}
 
-	public getLanguage() {
+	public getLanguage(): any {
 		return this.language;
 	}
 
