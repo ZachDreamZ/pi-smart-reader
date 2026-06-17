@@ -1,4 +1,6 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { Type } from "typebox";
+import { StringEnum } from "@earendil-works/pi-ai";
 import { SmartParser } from "./parser";
 import { SkeletonEngine } from "./skeleton";
 import { SymbolExtractor } from "./extractor";
@@ -374,44 +376,51 @@ export default async function (pi: ExtensionAPI) {
 
 	pi.registerTool({
 		name: "smart_read",
+		label: "Smart Read",
 		description:
 			"Read a file structurally. Use 'skeleton' mode to see the API of a large file, or 'symbol' mode to extract a specific function body.",
-		parameters: {
-			type: "object",
-			properties: {
-				path: { type: "string", description: "Path to the file to read" },
-				options: {
-					type: "object",
-					properties: {
-						mode: {
-							type: "string",
-							enum: ["skeleton", "symbol"],
-							description: "Extraction mode",
-						},
-						symbol: {
-							type: "string",
-							description:
-								"The name of the symbol to extract (required for 'symbol' mode)",
-						},
-					},
-					required: ["mode"],
-				},
-			},
-			required: ["path", "options"],
-		},
-		handler: async (input: any, _ctx: any) => {
-			const { path: filePath, options } = input;
+		parameters: Type.Object({
+			path: Type.String({ description: "Path to the file to read" }),
+			options: Type.Object({
+				mode: StringEnum(["skeleton", "symbol"] as const, {
+					description: "Extraction mode",
+				}),
+				symbol: Type.Optional(
+					Type.String({
+						description:
+							"The name of the symbol to extract (required for 'symbol' mode)",
+					}),
+				),
+			}),
+		}),
+		execute: async (
+			_toolCallId: string,
+			params: any,
+			_signal: AbortSignal | undefined,
+			_onUpdate: any,
+			_ctx: any,
+		) => {
+			const { path: filePath, options } = params;
 			const mode = options?.mode;
 
 			try {
 				if (!mode) {
-					throw new Error("options.mode is required.");
+					return {
+						content: [{ type: "text", text: "Error: options.mode is required." }],
+						isError: true,
+					};
 				}
 
 				if (!initialized) {
-					throw new Error(
-						"Parser not initialized. Check if tree-sitter WASM files are available.",
-					);
+					return {
+						content: [
+							{
+								type: "text",
+								text: "Parser not initialized. Check if tree-sitter WASM files are available.",
+							},
+						],
+						isError: true,
+					};
 				}
 
 				const absolutePath = path.resolve(filePath);
@@ -431,15 +440,25 @@ export default async function (pi: ExtensionAPI) {
 					);
 
 					return {
-						content: skeleton,
-						mode: "skeleton",
-						message: `Skeletal view generated (${originalLines} → ${skeletonLines} lines, ${reduction}% reduction).`,
+						content: [{ type: "text", text: skeleton }],
+						details: {
+							mode: "skeleton",
+							message: `Skeletal view generated (${originalLines} → ${skeletonLines} lines, ${reduction}% reduction).`,
+						},
 					};
 				}
 
 				if (mode === "symbol") {
 					if (!options.symbol) {
-						throw new Error("Symbol name is required for 'symbol' mode.");
+						return {
+							content: [
+								{
+									type: "text",
+									text: "Symbol name is required for 'symbol' mode.",
+								},
+							],
+							isError: true,
+						};
 					}
 
 					const { content, relatedSymbols } = symbolExtractor.extractSymbol(
@@ -448,20 +467,28 @@ export default async function (pi: ExtensionAPI) {
 					);
 
 					return {
-						content,
-						relatedSymbols,
-						mode: "symbol",
-						message: `Extracted symbol '${options.symbol}' and identified ${relatedSymbols.length} related dependencies.`,
+						content: [{ type: "text", text: content }],
+						details: {
+							mode: "symbol",
+							message: `Extracted symbol '${options.symbol}' and identified ${relatedSymbols.length} related dependencies.`,
+							relatedSymbols,
+						},
 					};
 				}
 
-				throw new Error(`Unsupported mode: ${mode}`);
+				return {
+					content: [{ type: "text", text: `Unsupported mode: ${mode}` }],
+					isError: true,
+				};
 			} catch (error: any) {
 				return {
-					content: "",
-					mode: mode || "unknown",
-					message: "",
-					error: `Failed to smart-read ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+					content: [
+						{
+							type: "text",
+							text: `Failed to smart-read ${filePath}: ${error instanceof Error ? error.message : String(error)}`,
+						},
+					],
+					isError: true,
 				};
 			}
 		},

@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2026-06-17
+
+### Fixed
+
+- **Critical: `smart_read` tool crash ("definition.execute is not a function")** — tool registration used `handler` field (deprecated) instead of `execute` with the correct `(toolCallId, params, signal, onUpdate, ctx)` signature. Also fixed return format from plain object to `{ content: [{ type: "text", text }], details, isError }`.
+
+### Changed
+
+- **Tool registration** — migrated from deprecated `handler` callback to Pi v0.79+ `execute` API with proper TypeBox `parameters` schema and `StringEnum` from `@earendil-works/pi-ai`.
+- **Imports** — added `Type` from `typebox` and `StringEnum` from `@earendil-works/pi-ai`.
+
 ## [0.4.1] - 2026-06-17
 
 ### Fixed

@@ -15,8 +15,7 @@ function resolveWasmPath(wasmFile: string): string {
 		try {
 			readFileSync(loc);
 			return loc;
-		} catch {
-		}
+		} catch {}
 	}
 	return locations[0];
 }
@@ -41,8 +40,7 @@ export class SmartParser {
 
 			// Resolve language WASM file
 			const wasmPath =
-				_config?.languagePath ||
-				resolveWasmPath("tree-sitter-typescript.wasm");
+				_config?.languagePath || resolveWasmPath("tree-sitter-typescript.wasm");
 			const wasmBytes = readFileSync(wasmPath);
 
 			const lang = await (Parser as any).Language.load(wasmBytes);
